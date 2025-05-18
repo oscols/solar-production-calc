@@ -35,7 +35,7 @@ A command-line tool to fetch and plot average hourly solar production profiles f
 ## Usage
 
 ```bash
-solar-calc LAT LON MONTH TRACKERTYPE [--angle ANGLE] [--aspect AZIMUTH] [-o OUTPUT]
+solar-calc LAT LON MONTH TRACKERTYPE PEAKPOWER [--angle ANGLE] [--aspect AZIMUTH] [-o OUTPUT]
 ```
 
 - `<LAT>`: latitude in decimal degrees (e.g. `45.0`)
@@ -46,6 +46,7 @@ solar-calc LAT LON MONTH TRACKERTYPE [--angle ANGLE] [--aspect AZIMUTH] [-o OUTP
   - `1` = Vertical single-axis tracking
   - `2` = Horizontal single-axis tracking
   - `3` = Dual-axis tracking
+- `<PEAKPOWER>`: panel peak power (e.g. `450` W)
 
 ### Optional Arguments
 
@@ -57,17 +58,17 @@ solar-calc LAT LON MONTH TRACKERTYPE [--angle ANGLE] [--aspect AZIMUTH] [-o OUTP
 
 **Fixed tilt** (angle = 25°, azimuth = 0°), display:
 ```bash
-solar-calc 45.0 8.0 6 0 --angle 25 --aspect 0
+solar-calc 45.0 8.0 6 0 450 --angle 25 --aspect 0
 ```
 
 **Vertical single-axis** (angle = 30°), save to `plots/`:
 ```bash
-solar-calc 45.0 8.0 6 1 --angle 30 -o plots/
+solar-calc 45.0 8.0 6 1 450 --angle 30 -o plots/
 ```
 
 **Dual-axis** (no angle or aspect):
 ```bash
-solar-calc 45.0 8.0 6 3
+solar-calc 45.0 8.0 6 3 450
 ```
 
 ## Requirements
