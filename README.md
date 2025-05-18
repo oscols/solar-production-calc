@@ -79,6 +79,15 @@ solar-calc 45.0 8.0 6 3
 
 _No additional dependencies are required beyond what’s listed above._
 
+## PVGIS Configuration
+
+By default, this tool computes **unshaded production** using the following PVGIS settings:
+
+- **loss**: 14 (%)
+- **pvtechchoice**: `crystSi`
+- **raddatabase**: `PVGIS-SARAH3`
+- **Time span**: based on the past 5 years of meteorological data
+
 ## Contributing
 
 Contributions, issues, and feature requests are welcome! Please open an issue or submit a pull request.
