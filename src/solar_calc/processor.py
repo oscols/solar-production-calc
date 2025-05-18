@@ -3,7 +3,7 @@ from typing import List
 from solar_calc.pvgis_models import HourlyRecord
 
 
-def average_monthly_profile(hourly_records: List[HourlyRecord], month: int) -> List[float]:
+def average_monthly_profile(hourly_records: List[HourlyRecord], month: int, peakpower: int) -> List[float]:
     """
     Given a list of HourlyRecord and a month (1-12),
     returns a list of 24 average production values per hour for that month.
@@ -22,6 +22,8 @@ def average_monthly_profile(hourly_records: List[HourlyRecord], month: int) -> L
         # Filter by requested month
         if dt.month == month and rec.P is not None:
             hour = dt.hour
+            # Scale production by peak power
+            rec.P *= peakpower / 1000.0
             sums[hour] += rec.P
             counts[hour] += 1
 

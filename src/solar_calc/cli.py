@@ -59,6 +59,12 @@ def main():
         )
     )
     parser.add_argument(
+        "peakpower",
+        type=int,
+        choices=range(1,1001),
+        help="Peak power in W (1-1000)"
+    )
+    parser.add_argument(
         "--angle",
         type=int,
         choices=range(0,91),
@@ -120,7 +126,7 @@ def main():
 
     # Process data
     hourly_records = pv_model.outputs.hourly
-    profile = average_monthly_profile(hourly_records, month=args.month)
+    profile = average_monthly_profile(hourly_records, args.month, args.peakpower)
 
     # Prepare title components
     tracker_name = TRACKER_NAMES.get(args.trackertype, f"Type {args.trackertype}")
