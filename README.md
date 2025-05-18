@@ -13,15 +13,15 @@ A command-line tool to fetch and plot average hourly solar production profiles f
 
 1. **Clone the repository**
    ```bash
-   git clone https://<your-repo-url>/solar-production-calc.git
+   git clone https://github.com/oscols/solar-production-calc.git
    cd solar-production-calc
    ```
 
 2. **Create a virtual environment** (recommended)
    ```bash
    python3 -m venv venv
-   source venv/bin/activate      # macOS/Linux
-   venv\Scripts\activate       # Windows
+   source venv/bin/activate     # macOS/Linux
+   venv\Scripts\activate        # Windows
    ```
 
 3. **Install dependencies**
@@ -85,4 +85,4 @@ Contributions, issues, and feature requests are welcome! Please open an issue or
 
 ## License
 
-MIT © Your Name
+MIT © Oscar Olsson
