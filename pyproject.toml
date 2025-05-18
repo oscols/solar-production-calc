@@ -1,0 +1,23 @@
+# pyproject.toml
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "solar-production-calc"
+version = "0.1.0"
+description = "CLI tool to fetch and plot PVGIS solar-production profiles"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+  "requests",
+  "pydantic>=2.0",
+  "matplotlib",
+]
+
+[project.scripts]
+solar-calc = "solar_calc.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
