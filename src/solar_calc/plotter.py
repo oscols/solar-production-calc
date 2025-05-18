@@ -7,7 +7,8 @@ def plot_profile(
     subtitle: Optional[str] = None,
     tilt: Optional[float] = None,
     azimuth: Optional[float] = None,
-    figsize: tuple = (10, 5)
+    figsize: tuple = (10, 5),
+    output_path: Optional[str] = None,
 ) -> None:
     """
     Plot a 24-point daily average profile of solar production with a main title and subtitle.
@@ -53,5 +54,8 @@ def plot_profile(
     # Move the subplot down to make space for the subtitle
     fig.subplots_adjust(top=0.83)
 
-    # Display
-    plt.show()
+    # Save or display the plot
+    if output_path:
+        plt.savefig(output_path, dpi=150, bbox_inches='tight')
+    else:
+        plt.show()

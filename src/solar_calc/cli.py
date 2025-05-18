@@ -4,6 +4,8 @@ import argparse
 from solar_calc.pvgis import fetch_hourly_profile
 from solar_calc.processor import average_monthly_profile
 from solar_calc.plotter import plot_profile
+from pathlib import Path
+
 
 USER_TO_PVGIS_TRACKER = {
     0: 0,  # user 0=fixed  → API 0=fixed
@@ -68,6 +70,11 @@ def main():
         choices=range(-180,181),
         help="Azimuth angle in degrees (-180 to 180)"
     )
+    parser.add_argument(
+        "-o", "--output",
+        help="Where to save the plot (filename or directory). If not set, shows interactively.",
+        default=None,
+    )
 
     args = parser.parse_args()
 
@@ -86,31 +93,57 @@ def main():
 
     api_tracker = USER_TO_PVGIS_TRACKER[args.trackertype]
 
+    # Build API params
+    params = {
+        "lat": args.latitude,
+        "lon": args.longitude,
+        "trackingtype": api_tracker,
+        "startyear": 2023,
+        "endyear": 2023,
+        "pvcalculation": 1,
+        "peakpower": 1.0,
+        "loss": 14,
+        "pvtechchoice": "crystSi",
+        "raddatabase": "PVGIS-SARAH3",
+    }
+    if args.angle is not None:
+        params["angle"] = args.angle
+    if args.aspect is not None:
+        params["aspect"] = args.aspect
+
+    # Fetch and validate data
     try:
-        pv_model = fetch_hourly_profile(
-            lat=args.latitude,
-            lon=args.longitude,
-            trackingtype=api_tracker,
-            angle=args.angle,
-            aspect=args.aspect,
-            startyear=2023,
-            endyear=2023,
-            pvcalculation=1,
-            peakpower=1.0,
-            loss=14,
-            pvtechchoice="crystSi",
-            raddatabase="PVGIS-SARAH3"
-        )
+        pv_model = fetch_hourly_profile(**params)
     except Exception as e:
         print(f"Error fetching PVGIS profile: {e}", file=sys.stderr)
         sys.exit(1)
 
+    # Process data
     hourly_records = pv_model.outputs.hourly
     profile = average_monthly_profile(hourly_records, month=args.month)
 
+    # Prepare title components
     tracker_name = TRACKER_NAMES.get(args.trackertype, f"Type {args.trackertype}")
     month_name = MONTHS.get(args.month, f"Month {args.month}")
 
+    # Generate a default filename
+    filename = (
+        f"solar_{args.latitude}_{args.longitude}_"
+        f"{args.month:02d}_{tracker_name.replace(' ', '')}.png"
+    )
+
+    # Decide output path: save or show
+    if args.output:
+        out = Path(args.output)
+        if out.is_dir():
+            out.mkdir(parents=True, exist_ok=True)
+            output_path = out / filename
+        else:
+            output_path = out
+    else:
+        output_path = None
+
+    # Plot or save
     plot_profile(
         profile,
         title=f"Average Hourly Production",
@@ -120,6 +153,7 @@ def main():
         ),
         tilt=args.angle,
         azimuth=args.aspect,
+        output_path=str(output_path) if output_path else None,
     )
 
 
