@@ -98,7 +98,7 @@ def main():
         "lat": args.latitude,
         "lon": args.longitude,
         "trackingtype": api_tracker,
-        "startyear": 2023,
+        "startyear": 2019,
         "endyear": 2023,
         "pvcalculation": 1,
         "peakpower": 1.0,
