@@ -4,6 +4,13 @@ import argparse
 from solar_calc.pvgis import fetch_hourly_profile
 from solar_calc.processor import average_monthly_profile
 
+USER_TO_PVGIS_TRACKER = {
+    0: 0,  # user 0=fixed  → API 0=fixed
+    1: 3,  # user 1=vertical → API 3=vertical
+    2: 5,  # user 2=horizontal → API 5=horizontal
+    3: 2,  # user 3=dual-axis → API 2=dual-axis
+}
+
 def main():
     parser = argparse.ArgumentParser(
         description="Plot average hourly solar production via PVGIS"
@@ -27,8 +34,13 @@ def main():
     parser.add_argument(
         "trackertype",
         type=int,
-        choices=[0, 1, 2],
-        help="0=fixed, 1=single-axis tracking, 2=dual-axis tracking"
+        choices=USER_TO_PVGIS_TRACKER.keys(),
+        help=(
+            "0=fixed, "
+            "1=vertical single-axis tracking, "
+            "2=horizontal single-axis tracking, "
+            "3=dual-axis tracking"
+        )
     )
     parser.add_argument(
         "angle",
@@ -45,11 +57,13 @@ def main():
 
     args = parser.parse_args()
 
+    api_tracker = USER_TO_PVGIS_TRACKER[args.trackertype]
+
     try:
         pv_model = fetch_hourly_profile(
             lat=args.latitude,
             lon=args.longitude,
-            trackertype=args.trackertype,
+            trackingtype=api_tracker,
             angle=args.angle,
             aspect=args.aspect,
             startyear=2023,
