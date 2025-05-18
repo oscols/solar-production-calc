@@ -2,6 +2,7 @@
 import sys
 import argparse
 from solar_calc.pvgis import fetch_hourly_profile
+from solar_calc.processor import average_monthly_profile
 
 def main():
     parser = argparse.ArgumentParser(
@@ -44,8 +45,6 @@ def main():
 
     args = parser.parse_args()
 
-    # month = args.month
-
     try:
         pv_model = fetch_hourly_profile(
             lat=args.latitude,
@@ -65,9 +64,10 @@ def main():
         print(f"Error fetching PVGIS profile: {e}", file=sys.stderr)
         sys.exit(1)
 
-    for rec in pv_model.outputs.hourly[:10]:
-        print(f"{rec.time} → P={rec.P:.2f} W, G={rec.G_i:.1f} W/m², T2m={rec.T2m:.1f}°C")
+    hourly_records = pv_model.outputs.hourly
+    profile = average_monthly_profile(hourly_records, month=args.month)
 
+    print(profile)
 
 if __name__ == "__main__":
     main()
