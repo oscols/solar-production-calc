@@ -3,12 +3,26 @@ import sys
 import argparse
 from solar_calc.pvgis import fetch_hourly_profile
 from solar_calc.processor import average_monthly_profile
+from solar_calc.plotter import plot_profile
 
 USER_TO_PVGIS_TRACKER = {
     0: 0,  # user 0=fixed  → API 0=fixed
     1: 3,  # user 1=vertical → API 3=vertical
     2: 5,  # user 2=horizontal → API 5=horizontal
     3: 2,  # user 3=dual-axis → API 2=dual-axis
+}
+
+TRACKER_NAMES = {
+    0: "Fixed",
+    1: "Vertical Single-Axis",
+    2: "Horizontal Single-Axis",
+    3: "Dual-Axis",
+}
+
+MONTHS = {
+    1: "January",   2: "February",  3: "March",     4: "April",
+    5: "May",       6: "June",      7: "July",      8: "August",
+    9: "September", 10: "October",  11: "November", 12: "December",
 }
 
 def main():
@@ -43,19 +57,32 @@ def main():
         )
     )
     parser.add_argument(
-        "angle",
+        "--angle",
         type=int,
         choices=range(0,91),
         help="Tilt angle in degrees (0-90)"
     )
     parser.add_argument(
-        "aspect",
+        "--aspect",
         type=int,
         choices=range(-180,181),
         help="Azimuth angle in degrees (-180 to 180)"
     )
 
     args = parser.parse_args()
+
+    # Validate conditional requirements
+    t = args.trackertype
+    if t == 0:
+        if args.angle is None or args.aspect is None:
+            parser.error("Fixed tilt requires --angle and --aspect to be set.")
+    elif t in (1, 2):
+        if args.aspect is None:
+            parser.error("Single-axis tracking requires --aspect to be set.")
+        args.angle = None  # single-axis tracking does not require aspect
+    elif t == 3:
+        args.angle = None  # dual-axis tracking does not require aspect
+        args.aspect = None  # dual-axis tracking does not require angle
 
     api_tracker = USER_TO_PVGIS_TRACKER[args.trackertype]
 
@@ -81,7 +108,20 @@ def main():
     hourly_records = pv_model.outputs.hourly
     profile = average_monthly_profile(hourly_records, month=args.month)
 
-    print(profile)
+    tracker_name = TRACKER_NAMES.get(args.trackertype, f"Type {args.trackertype}")
+    month_name = MONTHS.get(args.month, f"Month {args.month}")
+
+    plot_profile(
+        profile,
+        title=f"Average Hourly Production",
+        subtitle=(
+            f"Latitude {args.latitude}°, Longitude {args.longitude}° - {month_name} - "
+            f"{tracker_name}"
+        ),
+        tilt=args.angle,
+        azimuth=args.aspect,
+    )
+
 
 if __name__ == "__main__":
     main()
